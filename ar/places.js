@@ -1,142 +1,104 @@
-window.onload = () => {
-    // let method = 'dynamic';
-
-    // if you want to statically add places, de-comment following line
-    method = 'static';
-
-    if (method === 'static') {
-        let places = staticLoadPlaces();
-        renderPlaces(places);
-    }
-
-    if (method !== 'static') {
-
-        // first get current user location
-        return navigator.geolocation.getCurrentPosition(function (position) {
-
-            // than use it to load from remote APIs some places nearby
-            dynamicLoadPlaces(position.coords)
-                .then((places) => {
-                    renderPlaces(places);
-                })
-        },
-            (err) => console.error('Error in retrieving position', err),
+// getting places from APIs
+function loadPlaces(position) {
+    const method = 'static';
+    // const method = 'api';
+    if(method === 'static') {
+        return [
             {
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 27000,
-            }
-        );
-    }
-};
-
-function staticLoadPlaces() {
-    return [
-        {
-            name: "LIBRARY",
-            location: {
-                lat: 23.108156404203143, // add here latitude if using static data
-                lng: 72.59498734978379, // add here longitude if using static data
-            }
-        },
-        {
-            name: "A-block",
-            location: {
-                lat: 23.1064422997269,  // add here latitude if using static data
-                lng: 72.59575386356772, // add here longitude if using static data
-            }
-        },
-        {
-            name: "M-Block",
-            location: {
-                lat: 23.10796558905296, // add here latitude if using static data
-                lng:  72.59461530062512, // add here longitude if using static data
-            }
-        },
-        {
-            name: "GTU",
-            location: {
-                lat: 23.105923398933385,  // add here latitude if using static data
-                lng: 72.59414710034639, // add here longitude if using static data
-            }
-        },
-    ];
-}
-
-// getting places from REST APIs
-function dynamicLoadPlaces(position) {
-    let params = {
-        radius: 300,    // search places not farther than this value (in meters)
-        clientId: 'HZIJGI4COHQ4AI45QXKCDFJWFJ1SFHYDFCCWKPIJDWHLVQVZ',   // add your credentials here
-        clientSecret: '',   // add your credentials here
-        version: '20300101',    // foursquare versioning, required but unuseful for this demo
-    };
-
-    // CORS Proxy to avoid CORS problems
-    let corsProxy = 'https://cors-anywhere.herokuapp.com/';
-
-    // Foursquare API
-    let endpoint = `${corsProxy}https://api.foursquare.com/v2/venues/search?intent=checkin
-        &ll=${position.latitude},${position.longitude}
-        &radius=${params.radius}
-        &client_id=${params.clientId}
-        &client_secret=${params.clientSecret}
-        &limit=15
-        &v=${params.version}`;
-    return fetch(endpoint)
-        .then((res) => {
-            return res.json()
-                .then((resp) => {
-                    return resp.response.venues;
-                })
-        })
-        .catch((err) => {
-            console.error('Error with places API', err);
-        })
-};
-
-function renderPlaces(places) {
-    let scene = document.querySelector('a-scene');
-
-    places.forEach((place) => {
-        const latitude = place.location.lat;
-        const longitude = place.location.lng;
-
-        // add place icon`
-        const icon = document.createElement('a-image');
-        icon.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude}`);
-        icon.setAttribute('name', place.name);
-        icon.setAttribute('src', './assets/assets.gltfhttps://github.com/nicolocarpignoli/location-based-ar-tutorial.git');
-
-        // for debug purposes, just show in a bigger scale, otherwise I have to personally go on places...
-        icon.setAttribute('scale', '20, 20');
-
-        icon.addEventListener('loaded', () => window.dispatchEvent(new CustomEvent('gps-entity-place-loaded')));
-
-        const clickListener = function (ev) {
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            const name = ev.target.getAttribute('name');
-
-            const el = ev.detail.intersection && ev.detail.intersection.object.el;
-
-            if (el && el === ev.target) {
-                const label = document.createElement('span');
-                const container = document.createElement('div');
-                container.setAttribute('id', 'place-label');
-                label.innerText = name;
-                container.appendChild(label);
-                document.body.appendChild(container);
-
-                setTimeout(() => {
-                    container.parentElement.removeChild(container);
-                }, 1500);
-            }
+                name: "LIBRARY",
+                location: {
+                    lat: 23.108156404203143, // add here latitude if using static data
+                    lng: 72.59498734978379, // add here longitude if using static data
+                }
+            },
+            {
+                name: "A-block",
+                location: {
+                    lat: 23.1064422997269,  // add here latitude if using static data
+                    lng: 72.59575386356772, // add here longitude if using static data
+                }
+            },
+            {
+                name: "M-Block",
+                location: {
+                    lat: 23.10796558905296, // add here latitude if using static data
+                    lng:  72.59461530062512, // add here longitude if using static data
+                }
+            },
+            {
+                name: "GTU",
+                location: {
+                    lat: 23.105923398933385,  // add here latitude if using static data
+                    lng: 72.59414710034639, // add here longitude if using static data
+                }
+            },
+        ];
+    } else {
+        const params = {
+            radius: 300,    // search places not farther than this value (in meters)
+            clientId: '<your-client-id>',
+            clientSecret: '<your-client-secret>',
+            version: '20300101',    // foursquare versioning, required but unuseful for this demo
         };
+    
+        // CORS Proxy to avoid CORS problems
+        const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+    
+        // Foursquare API (limit param: number of maximum places to fetch)
+        const endpoint = `${corsProxy}https://api.foursquare.com/v2/venues/search?intent=checkin
+            &ll=${position.latitude},${position.longitude}
+            &radius=${params.radius}
+            &client_id=${params.clientId}
+            &client_secret=${params.clientSecret}
+            &limit=30 
+            &v=${params.version}`;
+        return fetch(endpoint)
+            .then((res) => {
+                return res.json()
+                    .then((resp) => {
+                        return resp.response.venues;
+                    })
+            })
+            .catch((err) => {
+                console.error('Error with places API', err);
+            })
+    }
+    
+};
 
-        icon.addEventListener('click', clickListener);
 
-        scene.appendChild(icon);
-    });
-}
+window.onload = () => {
+    const scene = document.querySelector('a-scene');
+
+    // first get current user location
+    return navigator.geolocation.getCurrentPosition(function (position) {
+
+        // than use it to load from remote APIs some places nearby
+        loadPlaces(position.coords)
+            .then((places) => {
+                places.forEach((place) => {
+                    const latitude = place.location.lat;
+                    const longitude = place.location.lng;
+
+                    // add place name
+                    const placeText = document.createElement('a-link');
+                    placeText.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude};`);
+                    placeText.setAttribute('title', place.name);
+                    placeText.setAttribute('scale', '15 15 15');
+                    
+                    placeText.addEventListener('loaded', () => {
+                        window.dispatchEvent(new CustomEvent('gps-entity-place-loaded'))
+                    });
+
+                    scene.appendChild(placeText);
+                });
+            })
+    },
+        (err) => console.error('Error in retrieving position', err),
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 27000,
+        }
+    );
+};
