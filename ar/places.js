@@ -102,11 +102,11 @@ function renderPlaces(places) {
         const latitude = place.location.lat;
         const longitude = place.location.lng;
 
-        // add place icon
+        // add place icon`
         const icon = document.createElement('a-image');
         icon.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude}`);
         icon.setAttribute('name', place.name);
-        icon.setAttribute('src', './assets/assets.gltf');
+        icon.setAttribute('src', './assets/assets.gltfhttps://github.com/nicolocarpignoli/location-based-ar-tutorial.git');
 
         // for debug purposes, just show in a bigger scale, otherwise I have to personally go on places...
         icon.setAttribute('scale', '20, 20');
