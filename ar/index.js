@@ -33,7 +33,7 @@ function loadPlaces(position) {
             radius: 300,    // search places not farther than this value (in meters)
             clientId: '<YOUR-CLIENT-ID>',
             clientSecret: 'YOUR-CLIENT-SECRET',
-            version: '20300101',    // foursquare versioning, required but un-      useful for this demo
+            version: '20300101',    // foursquare versioning, required but un-useful for this demo
         };
     
         // CORS Proxy to avoid CORS problems
