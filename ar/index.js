@@ -1,6 +1,7 @@
 // getting places from APIs
 function loadPlaces(position) {
 
+    const method = 'notapi'
     // const method = 'api'
     
     const PLACES = [
