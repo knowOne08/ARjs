@@ -26,6 +26,13 @@ function loadPlaces(position) {
                 lng:  72.59461530062512, // add here longitude if using static data
             }
         },
+        {
+            name: "GTU",
+            location: {
+                lat: 23.105923398933385,  // add here latitude if using static data
+                lng: 72.59414710034639, // add here longitude if using static data
+            }
+        },
     ];
 
     if(method == 'api') {
